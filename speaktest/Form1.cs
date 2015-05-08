@@ -39,7 +39,7 @@ namespace speaktest
             
             speech.SelectVoiceByHints(VoiceGender.Male,VoiceAge.Adult);
             // 添加语法
-            GrammarBuilder gb1 = new GrammarBuilder(new Choices("小白", "取消"));
+            GrammarBuilder gb1 = new GrammarBuilder(new Choices("小白", "取消", "测试"));
             GrammarBuilder gb2 = new GrammarBuilder(new Choices("好吃吗", "好吃"));
             GrammarBuilder gb3 = new GrammarBuilder(new Choices("还想再吃", "还吃吗", "18度"));
             GrammarBuilder gb4 = new GrammarBuilder(new Choices("打开房门"));
@@ -56,8 +56,14 @@ namespace speaktest
             _recognizer.SpeechRecognitionRejected += new EventHandler<SpeechRecognitionRejectedEventArgs>(_recognizer_SpeechRecognitionRejected);
 
             _recognizer.SetInputToDefaultAudioDevice();   // 设置语音输入设备
-            _recognizer.RecognizeAsync(RecognizeMode.Multiple); // 开启异步语音识别
+            
 
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            _recognizer.RecognizeAsync(RecognizeMode.Multiple); // 开启异步语音识别
+            textBox1.Text += "请在10秒后呼叫…………";
+            textBox1.Text += "\r\n请在10秒后呼叫…………";
         }
         /// <summary>
         /// 语音识别后的处理函数
@@ -68,22 +74,26 @@ namespace speaktest
         {
             // 关闭识别，防止speech说出来的话被误识别
             _recognizer.RecognizeAsyncStop();
-            Thread.Sleep(30);
-            Console.WriteLine("测试");
-            if (e.Result.Confidence > 0.95)
+            //Thread.Sleep(10);
+           // Console.WriteLine("我："+e.Result.Text);
+            textBox1.Text += "\r\n我："+e.Result.Text;
+            if (e.Result.Confidence > 0.90)
             {
-                Console.WriteLine(e.Result.Text);
+                textBox1.Text += "\r\n我：" + e.Result.Text;
+                //Console.WriteLine(e.Result.Text);
 
-                if (e.Result.Text == "计算机" || e.Result.Text == "小白" || Issenced==true)
+                if (e.Result.Text == "测试" || e.Result.Text == "小白" || Issenced==true)
                 {
                     if (!Issenced)
                     {
                         speech.Speak("在");
+                        textBox1.Text += "\r\n小白：" + "在";
                     }
                     // 进入待命模式
                     IsStandingBy = true;
                     Issenced = true;
                     Console.WriteLine("进入待命模式");
+                    textBox1.Text += "进入待命模式";
                     // 重新计时，10秒命令超时。
                     tmrPrevious = tmrCurrent;
                     tmrCurrent = new System.Threading.Timer(new TimerCallback(TimerCall), this, 10000, 0);  // 当前的，新的
@@ -118,6 +128,7 @@ namespace speaktest
                     IsStandingBy = false; // 退出待命模式
                     tmrCurrent.Dispose();
                     Console.WriteLine("退出待命模式");
+                    textBox1.Text += "退出待命模式";
                 }
             }
 
@@ -130,6 +141,8 @@ namespace speaktest
             _recognizer.RecognizeAsyncStop();
             Thread.Sleep(30);
             speech.Speak("请再说一遍");
+            textBox1.Text += "\r\n请再说一遍"+e.Result.Text;
+            textBox1.Text += "\r\n请再说一遍";
             _recognizer.RecognizeAsync(RecognizeMode.Multiple); // 开启识别
         }
 
@@ -140,6 +153,8 @@ namespace speaktest
             IsStandingBy = false;
             Console.WriteLine("退出待命模式");
         }
+
+      
 
 
 
